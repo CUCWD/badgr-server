@@ -52,36 +52,6 @@ server {
                # return a 403 for static files that shouldn't be
                # in the staticfiles directory
                location ~ ^/static/(?:.*)(?:\.xml|\.json) {
-              proxy_set_header X-Forwarded-For $remote_addr;
-
-               # newrelic-specific header records the time when nginx handles a request.
-               proxy_set_header X-Queue-Start "t=${msec}";
-
-               proxy_set_header Host $http_host;
-
-               proxy_redirect off;
-
-               # Gunicorn Handoff
-               proxy_pass http://unix:/concentricsky/badgr-server/code/supervisor/mainsite.sock;
-        }
-
-        location / {
-               try_files $uri @proxy_to_badgr_server_app;
-        }
-
-        location ~ ^/media/(?P<file>.*) {
-               root /concentricsky/badgr-server/code;
-               try_files /mediafiles/$file =404;
-               expires 31536000s;
-        }
-
-        location ~ ^/static/(?P<file>.*) {
-               root /concentricsky/badgr-server/code;
-               try_files /staticfiles/$file /breakdown/static/$file =404;
-
-               # return a 403 for static files that shouldn't be
-               # in the staticfiles directory
-               location ~ ^/static/(?:.*)(?:\.xml|\.json) {
                      return 403;
                }
 
