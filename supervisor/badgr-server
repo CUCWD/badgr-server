@@ -1,0 +1,2 @@
+[group:badgr-server]
+programs=badgr-server-gunicorn,badgr-server-celery
