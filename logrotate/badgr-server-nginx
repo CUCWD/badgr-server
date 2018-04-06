@@ -1,0 +1,31 @@
+/concentricsky/badgr-server/code/logs/nginx/*access.log {
+  create 0640 badgr www-data
+  compress
+  delaycompress
+  dateext
+  missingok
+  notifempty
+  daily
+  rotate 90
+  size 1M
+  sharedscripts
+  postrotate
+        [ ! -f /var/run/nginx.pid ] || kill -HUP `cat /var/run/nginx.pid`
+  endscript
+}
+
+/concentricsky/badgr-server/code/logs/nginx/*error.log {
+  create 0640 badgr www-data
+  compress
+  delaycompress
+  dateext
+  missingok
+  notifempty
+  daily
+  rotate 90
+  size 1M
+  sharedscripts
+  postrotate
+        [ ! -f /var/run/nginx.pid ] || kill -HUP `cat /var/run/nginx.pid`
+  endscript
+}
