@@ -25,3 +25,5 @@ breakdown/static/css/*.map
 build/badgebook/
 
 test.cache/
+
+supervisor/*.sock
