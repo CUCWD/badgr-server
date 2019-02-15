@@ -1,0 +1,76 @@
+# Badgr server configuration
+#
+server {
+        listen 8000 default_server;
+        listen [::]:8000 default_server;
+
+        server_name ec2-34-203-226-85.compute-1.amazonaws.com;
+
+        access_log /concentricsky/badgr-server/code/logs/nginx/access.log combined;
+        error_log /concentricsky/badgr-server/code/logs/nginx/error.log error;
+
+        # Disables server version feedback on pages and in headers
+        server_tokens off;
+
+        rewrite ^(.*)/favicon.ico$ /static/images/favicon.ico last;
+        rewrite ^(.*)/favicon.png$ /static/images/favicon.png last;
+
+        location @proxy_to_badgr_server_app {
+               # Enable these settings depending if a load balancer is in front of the badgr app server or not.
+               # proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+               # proxy_set_header X-Forwarded-Port $http_x_forwarded_port;
+               # proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+               proxy_set_header X-Forwarded-Proto $scheme;
+               proxy_set_header X-Forwarded-Port $server_port;
+               proxy_set_header X-Forwarded-For $remote_addr;
+
+               # newrelic-specific header records the time when nginx handles a request.
+               proxy_set_header X-Queue-Start "t=${msec}";
+
+               proxy_set_header Host $http_host;
+
+               proxy_redirect off;
+
+               # Gunicorn Handoff
+               proxy_pass http://unix:/concentricsky/badgr-server/code/supervisor/mainsite.sock;
+        }
+
+        location / {
+               try_files $uri @proxy_to_badgr_server_app;
+        }
+
+        location ~ ^/media/(?P<file>.*) {
+               root /concentricsky/badgr-server/code;
+               try_files /mediafiles/$file =404;
+               expires 31536000s;
+        }
+
+        location ~ ^/static/(?P<file>.*) {
+               root /concentricsky/badgr-server/code;
+               try_files /staticfiles/$file /breakdown/static/$file =404;
+
+               # return a 403 for static files that shouldn't be
+               # in the staticfiles directory
+               location ~ ^/static/(?:.*)(?:\.xml|\.json) {
+                     return 403;
+               }
+
+               # http://www.red-team-design.com/firefox-doesnt-allow-cross-domain-fonts-by-default
+               location ~ "/static/(?P<collected>.*\.[0-9a-f]{12}\.(eot|otf|ttf|woff|woff2)$)" {
+                     expires max;
+                     add_header Access-Control-Allow-Origin *;
+                     try_files /staticfiles/$collected /breakdown/static/$collected =404;
+               }
+
+               # Set django-pipelined files to maximum cache time
+               location ~ "/static/(?P<collected>.*\.[0-9a-f]{12}\..*)" {
+                     expires max;
+                    # Without this try_files, files that have been run through
+                    # django-pipeline return 404s
+                    try_files /staticfiles/$collected /breakdown/static/$collected =404;
+               }
+
+               # Expire other static files immediately (there should be very few / none of these)
+               expires 300;
+        }
+}

@@ -1,0 +1,16 @@
+/concentricsky/badgr-server/code/logs/supervisor/*.log {
+  create 0640 badgr www-data
+  compress
+  copytruncate
+  delaycompress
+  dateext
+  dateformat -%Y%m%d-%s
+  missingok
+  notifempty
+  daily
+  rotate 90
+  size 1M
+  postrotate
+    /usr/bin/killall -HUP rsyslogd
+  endscript
+}
