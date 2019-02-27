@@ -4,7 +4,7 @@ server {
         listen 8000 default_server;
         listen [::]:8000 default_server;
 
-        server_name ec2-34-203-226-85.compute-1.amazonaws.com;
+        server_name ec2-3-83-138-228.compute-1.amazonaws.com;
 
         access_log /concentricsky/badgr-server/code/logs/nginx/access.log combined;
         error_log /concentricsky/badgr-server/code/logs/nginx/error.log error;
@@ -50,8 +50,8 @@ server {
                try_files /staticfiles/$file /breakdown/static/$file =404;
 
                # return a 403 for static files that shouldn't be
-               # in the staticfiles directory
-               location ~ ^/static/(?:.*)(?:\.xml|\.json) {
+               # in the staticfiles directory (included |\.json for swagger)
+               location ~ ^/static/(?:.*)(?:\.xml) {
                      return 403;
                }
 
