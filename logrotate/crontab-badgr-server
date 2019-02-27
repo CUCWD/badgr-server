@@ -22,7 +22,7 @@
 # m h  dom mon dow   command
 
 # Nginx logrotate every day
-@daily /usr/sbin/logrotate /concentricsky/badgr-server/code/logrotate/badgr-server-nginx --state /concentricsky/badgr-server/code/logrotate/logrotate-state
+@daily /usr/sbin/logrotate /concentricsky/badgr-server/code/logrotate/badgr-server-nginx --state /concentricsky/badgr-server/code/logrotate/logrotate-state --verbose
 
 # Supervisor logrotate every hour
-@hourly /usr/sbin/logrotate /concentricsky/badgr-server/code/logrotate/hourly/badgr-server-supervisor --state /concentricsky/badgr-server/code/logrotate/logrotate-state
+@hourly /usr/sbin/logrotate /concentricsky/badgr-server/code/logrotate/hourly/badgr-server-supervisor --state /concentricsky/badgr-server/code/logrotate/logrotate-state --verbose
